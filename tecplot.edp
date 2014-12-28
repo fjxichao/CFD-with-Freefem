@@ -1,0 +1,33 @@
+ofstream tec("Vcavity.dat");//cout streamline of velocity  //输出文件名和流
+ofstream tecp("Pcavity.dat");//cout pressure
+tec<<"Title="<<"Velocity"<<endl;                                 //tecplot字头
+tec<<"Variables="<<"X"<<","<<"Y"<<","<<"U"<<","<<"V"<<endl;
+tec<<"Zone"<<"   "<<"N="<<Th.nv<<","<<"E="<<Th.nt<<","<<"F=FEPOINT,ET=TRIANGLE"<<endl;
+
+
+tecp<<"Title="<<"Pressure"<<endl;                              //tecplot字头
+tecp<<"Variables="<<"X"<<","<<"Y"<<","<<"P"<<endl;
+tecp<<"Zone"<<"   "<<"N="<<Th.nv<<","<<"E="<<Th.nt<<","<<"F=FEPOINT,ET=TRIANGLE"<<endl;
+
+
+int j=0;
+for(int i=0;i<Th.nv;i++)
+{
+tec<<Th(i).x<<"   "<<Th(i).y<<"   "<<U(Th(i).x,Th(i).y)<<"   "<<V(Th(i).x,Th(i).y)<<endl;         //数据输出
+tecp<<Th(i).x<<"   "<<Th(i).y<<"   "<<p(Th(i).x,Th(i).y)<<endl;                                                //数据输出
+
+
+}
+for(int i=0;i<Th.nt;i++)                                                                              //网格信息
+{
+for(j=0;j<3;j++)
+{
+tec<<Th[i][j]+1<<"  ";
+tecp<<Th[i][j]+1<<"  ";
+}
+if(j==3)
+{
+tec<<endl;
+tecp<<endl;
+}
+}
