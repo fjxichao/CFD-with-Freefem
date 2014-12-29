@@ -1,2 +1,40 @@
+/*
+*FreeFem + + 与偏微分方程有限元数值计算
+* NS-cavity.dep
+* 2-dimension
+*/
+real nu=1.0,ite=1.0,TOL=1.0e-6;
+int it=0;
+mesh Th=square(20,20);
+fespace Uh(Th,P1b);
+fespace Ph(Th,P1);
+Uh u1,u2,v1,v2,oldu1,oldu2;
+Ph p,q;
+
+//define the problem
+problem NSNewton([u1,u2,p],[v1,v2,q])
   =int2d(Th)(nu*(dx(u1)*dx(v1)+dy(u1)*dy(v1)+dx(u2)*dx(v2)+dy(u2)*dy(v2))
+              + oldu1*dx(u1)*v1+oldu2*dy(u1)*v1+oldu1*dx(u2)*v2+oldu2*dy(u2)*v2
+              + u1*dx(oldu1)*v1+u2*dy(oldu1)*v1+u1*dx(oldu2)*v2+u2*dy(oldu2)*v2
               - p*(dx(v1)+dy(v2))+q*(dx(u1)+dy(u2)))
+    +int2d(Th)(-oldu1*dx(oldu1)*v1-oldu2*dy(oldu1)*v1
+               -oldu1*dx(oldu2)*v2-oldu2*dy(oldu2)*v2)
+    + on(1,2,4,u1=0,u2=0)+on(3,u1=1,u2=0);
+
+u1=0;u2=0;  //initinal value 
+
+while(ite<TOL&&it<100){
+  it++;
+  oldu1=u1;oldu2=u2;
+  NSNewton;
+  real iterUL2 = sqrt(int2d(Th)((u1-oldu1)^2+(u2-oldu2)^2));
+  real lnorm=sqrt(int2d(Th)((u1)^2+(u2)^2));
+
+  if (lnorm < 1.0e-30) 
+        lnorm = 1.0e-30;
+  ite=iterUL2/lnorm; 
+}
+plot(Th);
+plot([u1,u2],wait=1,value=1);
+plot(p,wait=1,value=1);
+plot([u1,u2],p,wait=1,value=1,fill=1);
